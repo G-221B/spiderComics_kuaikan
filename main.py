@@ -4,9 +4,7 @@ import re
 import execjs
 import numpy as np
 from PIL import Image
-from uitls import downLoadImg, createDirectory
-
-
+from uitls import downLoadImg, createDirectory, getTargetScriptText
 
 
 def downloadChapter(chapterId, comicsName):
@@ -80,32 +78,6 @@ def getChapterIdList():
         print('下载完成：', item['title'])
         if count == 1:
             return
-
-# 获取包含关键字的scripts列表下标
-def getTargetScriptIndex(scripts, keyWord):
-    for index, item in enumerate(scripts):
-        if keyWord in item:
-            return index
-    return -1
-
-# 获取目标的script文本
-def getTargetScriptText(htmlContent):
-    # 提取JavaScript代码部分
-    # 假设我们知道JavaScript代码在某个特定的script标签中
-    pattern = r'<script\b[^>]*>([\s\S]*?)<\/script>'
-    scripts = re.findall(pattern, htmlContent)
-    scriptIndex = getTargetScriptIndex(scripts, 'window.__NUXT__=')
-    if scriptIndex < 0:
-        print('getChapterIdList_script 标签变更，无法获取window.__NUXT__')
-        return ''
-    scriptText = scripts[scriptIndex]  # 假设我们需要的代码在第一个script标签中
-
-    scriptText = scriptText.replace('window.', 'var ')
-    return scriptText
-
-def wirtTextLog(logText): 
-    with open('./output.json', 'w+', encoding='utf-8') as file:
-        file.write(f'{logText}\n')
 
 if __name__ == '__main__':
     getChapterIdList()
