@@ -1,6 +1,5 @@
 from bs4 import BeautifulSoup
 import requests
-import re
 import execjs
 import numpy as np
 from PIL import Image
