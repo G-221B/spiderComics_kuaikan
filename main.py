@@ -6,8 +6,7 @@ from PIL import Image
 from uitls import downLoadImg, createDirectory, getTargetScriptText
 
 
-def downloadChapter(chapterId, comicsName):
-    isMobi = True
+def downloadChapter(chapterId, comicsName, isMobi):
     thredUrl = f'https://www.kuaikanmanhua.com/webs/comic-next/{chapterId}'
     if isMobi: 
        thredUrl = f'https://m.kuaikanmanhua.com/mobile/comics/{chapterId}/'
@@ -23,7 +22,11 @@ def downloadChapter(chapterId, comicsName):
 
     comicInfo = variable_value['data'][0]['comicInfo']
     title = comicInfo['title']
-    comicImgList = variable_value['data'][0]['res']['data']['comic_info']['comic_images']
+    if isMobi: 
+        comicImgList = variable_value['data'][0]['res']['data']['comic_info']['comic_images']
+    else:
+        comicImgList = comicInfo['comicImages']
+    
 
     i = 1
     imgFileNameList = []
@@ -54,10 +57,16 @@ def mergeImg(imgFileNameList, foldName, title):
     img.save(f'./漫画爬虫资源/{foldName}_长图合集/{title}.png')
 
 def getChapterIdList():
+    isMobi = True
+    comicsId = input('输入爬取漫画的id：') # 16222
+    isPC_confirmText = input('是否爬取电脑端漫画(是：输入（Y/y）, 否: 按回车跳过)：')
+    if isPC_confirmText == 'Y' or isPC_confirmText == 'y' :
+        isMobi = False
+
+    thredUrl = f'https://www.kuaikanmanhua.com/web/topic/{comicsId}/'
+    if isMobi:
+        thredUrl = f'https://m.kuaikanmanhua.com/mobile/{comicsId}/list/'
     
-    # thredUrl = input('输入漫画主页url：')
-    # thredUrl = f'https://www.kuaikanmanhua.com/web/topic/16222/'
-    thredUrl = f'https://m.kuaikanmanhua.com/mobile/16222/list/'
     res = requests.get(thredUrl)
 
 
@@ -71,12 +80,9 @@ def getChapterIdList():
     comicsName = variable_value['data'][0]['topicInfo']['title']
 
     createDirectory('./漫画爬虫资源')
-    count = 1
     for item in comics:
-        downloadChapter(item['id'], comicsName)
+        downloadChapter(item['id'], comicsName, isMobi)
         print('下载完成：', item['title'])
-        if count == 1:
-            return
 
 if __name__ == '__main__':
     getChapterIdList()
